@@ -12,6 +12,6 @@ $(document).ready(function(){
     $(this)
       .find('ul')
       .stop(true,true)
-      .fadeOut('fast');
+      .fadeOut('slow');
   });
 });
