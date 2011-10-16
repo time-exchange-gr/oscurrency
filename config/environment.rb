@@ -20,7 +20,7 @@ Rails::Initializer.run do |config|
   # To use Rails without a database, you must remove the Active Record framework
   # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
 
-  # Only load the plugins named here, in the order given. By default, all plugins 
+  # Only load the plugins named here, in the order given. By default, all plugins
   # in vendor/plugins are loaded in alphabetical order.
   # :all can be used as a placeholder for all plugins not explicitly named
   # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
@@ -48,8 +48,11 @@ Rails::Initializer.run do |config|
 
   # Make Active Record use UTC-base instead of local time
   # config.active_record.default_timezone = :utc
-  
-  config.time_zone = "Pacific Time (US & Canada)"
+
+  config.time_zone = "Athens"
+
+  # make Greek the default language
+  config.i18n.default_locale = :gr
 
   # Custom gem requirements
   # config.gem 'mislav-will_paginate', :version => '~> 2.3.2',
@@ -77,7 +80,7 @@ Rails::Initializer.run do |config|
 =end
   # config.gem 'rack-openid', :version => '>= 1.0.1'
 
-  secret = ENV['SESSION_SECRET'] || rand(36**64).to_s(36) 
+  secret = ENV['SESSION_SECRET'] || rand(36**64).to_s(36)
 
   config.action_controller.session = {
     :session_key => '_oscurrency_session',
@@ -115,11 +118,11 @@ GeoKit::default_formula = :sphere
 
 # This is the timeout value in seconds to be used for calls to the geocoder web
 # services.  For no timeout at all, comment out the setting.  The timeout unit
-# is in seconds. 
+# is in seconds.
 GeoKit::Geocoders::timeout = 3
 
 # These settings are used if web service calls must be routed through a proxy.
-# These setting can be nil if not needed, otherwise, addr and port must be 
+# These setting can be nil if not needed, otherwise, addr and port must be
 # filled in at a minimum.  If the proxy requires authentication, the username
 # and password can be provided as well.
 GeoKit::Geocoders::proxy_addr = nil
@@ -131,21 +134,21 @@ GeoKit::Geocoders::proxy_pass = nil
 # See http://developer.yahoo.com/faq/index.html#appid
 # and http://developer.yahoo.com/maps/rest/V1/geocode.html
 GeoKit::Geocoders::yahoo = 'REPLACE_WITH_YOUR_YAHOO_KEY'
-    
-# This is your Google Maps geocoder key. 
+
+# This is your Google Maps geocoder key.
 # See http://www.google.com/apis/maps/signup.html
 # and http://www.google.com/apis/maps/documentation/#Geocoding_Examples
 #GeoKit::Geocoders::google = 'REPLACE_WITH_YOUR_GOOGLE_KEY'
-    
+
 # This is your username and password for geocoder.us.
-# To use the free service, the value can be set to nil or false.  For 
+# To use the free service, the value can be set to nil or false.  For
 # usage tied to an account, the value should be set to username:password.
 # See http://geocoder.us
 # and http://geocoder.us/user/signup
-GeoKit::Geocoders::geocoder_us = false 
+GeoKit::Geocoders::geocoder_us = false
 
 # This is your authorization key for geocoder.ca.
-# To use the free service, the value can be set to nil or false.  For 
+# To use the free service, the value can be set to nil or false.  For
 # usage tied to an account, set the value to the key obtained from
 # Geocoder.ca.
 # See http://geocoder.ca
@@ -155,7 +158,7 @@ GeoKit::Geocoders::geocoder_ca = false
 # This is the order in which the geocoders are called in a failover scenario
 # If you only want to use a single geocoder, put a single symbol in the array.
 # Valid symbols are :google, :yahoo, :us, and :ca.
-# Be aware that there are Terms of Use restrictions on how you can use the 
+# Be aware that there are Terms of Use restrictions on how you can use the
 # various geocoders.  Make sure you read up on relevant Terms of Use for each
 # geocoder you are going to use.
 GeoKit::Geocoders::provider_order = [:google,:us]
