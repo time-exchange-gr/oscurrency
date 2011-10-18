@@ -4,31 +4,31 @@
 # Table name: photos
 #
 #  id           :integer(4)      not null, primary key
-#  person_id    :integer(4)      
-#  parent_id    :integer(4)      
-#  content_type :string(255)     
-#  filename     :string(255)     
-#  thumbnail    :string(255)     
-#  size         :integer(4)      
-#  width        :integer(4)      
-#  height       :integer(4)      
-#  primary      :boolean(1)      
-#  created_at   :datetime        
-#  updated_at   :datetime        
+#  person_id    :integer(4)
+#  parent_id    :integer(4)
+#  content_type :string(255)
+#  filename     :string(255)
+#  thumbnail    :string(255)
+#  size         :integer(4)
+#  width        :integer(4)
+#  height       :integer(4)
+#  primary      :boolean(1)
+#  created_at   :datetime
+#  updated_at   :datetime
 #
 
 class Photo < ActiveRecord::Base
   include ActivityLogger
   UPLOAD_LIMIT = 5 # megabytes
-  
+
   # attr_accessible is a nightmare with attachment_fu, so use
   # attr_protected instead.
   attr_protected :id, :person_id, :parent_id, :created_at, :updated_at
-  
+
   belongs_to :person
   belongs_to :group
-  has_attachment :content_type => :image, 
-                 :storage => :s3,
+  has_attachment :content_type => :image,
+                 #:storage => :s3,
                  :processor => 'Rmagick',
                  :max_size => UPLOAD_LIMIT.megabytes,
                  :min_size => 1,
@@ -36,11 +36,11 @@ class Photo < ActiveRecord::Base
                  :thumbnails => { :thumbnail    => '72>',
                                   :icon         => '36>',
                                   :bounded_icon => '36x36>' }
-  
+
   has_many :activities, :foreign_key => "item_id", :conditions => "item_type = 'Photo'", :dependent => :destroy
-    
+
   after_save :log_activity
-                 
+
   # Override the crappy default AttachmentFu error messages.
   def validate
     if filename.nil?
@@ -59,7 +59,7 @@ class Photo < ActiveRecord::Base
       end
     end
   end
-  
+
   def log_activity
     if self.primary?
       unless self.person.nil?
