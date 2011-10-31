@@ -26,12 +26,10 @@
       | <%= link_to t('button_delete'), req, :class => 'delete_req' %>
     <% end -%>
     <br>
-<% 
-=begin %>
+<!--    
     <% if !current_person.address.nil? && !req.person.address.nil? && !current_person?(req.person) -%>
       <%= number_with_precision(req.person.address.distance_to(current_person.address), 1).to_s %> <%= t('miles_away') %>
     <% end -%>
-<% 
-=end %>
+-->
   </p>
 </div>
