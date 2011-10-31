@@ -23,8 +23,12 @@
       | <%= link_to t('button_delete'), req_bid_path(bid.req,bid), :confirm => t('are_you_sure'), :method => :delete %>
     <% end -%>
     <br>
+<% 
+=begin %>
     <% if current_person?(bid.req.person) && !current_person.address.nil? && !bid.person.address.nil? && !current_person?(bid.person) -%>
       <%= number_with_precision(bid.person.address.distance_to(current_person.address), 1).to_s %> <%= t('miles_away') %>
     <% end -%>
+<% 
+=end %>
   </p>
 </li>
