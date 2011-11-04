@@ -281,10 +281,10 @@ gr:
       community_exchanges: "Ανταλλαγές Κοινότητας"
       home: "Αρχική"
       forum: "Φόρουμ"
-      requests: "Αιτήσεις"
+      requests: "Ζητείται"
       offers: "Προσφορές"
       exchanges: "Ανταλλαγές"
-      people: "Άνθρωποι"
+      people: "Μέλη"
     _people:
       header: "Ομάδας"
       all_members: "Όλα τα μέλη"
