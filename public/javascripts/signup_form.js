@@ -17,7 +17,7 @@ $(function() {
   $('#openid').hide();
   $('#new_person').submit(function() {
       if( $('#person_accept_agreement:checked').val() != 1 ) {
-        alert('please accept member agreement');
+        alert('Πρέπει να αποδεχθείτε την δήλωση μέλους για να συνεχίσετε.\n\nYou have to accept the member agreement to continue.');
         return false;
       }
   });
