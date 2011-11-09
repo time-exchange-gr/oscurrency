@@ -24,5 +24,5 @@ DEMO_USER_ID = 2
 # The number of days allowed to suspend a payment
 MAX_DAYS_SUSPEND_PAYMENT = 2
 
-AJAX_POSTS_PER_PAGE = 4
+AJAX_POSTS_PER_PAGE = 20
 

@@ -4,7 +4,7 @@ class Admin::CategoriesController < ApplicationController
   cache_sweeper :category_sweeper, :only => [:create, :update, :destroy]
 
   active_scaffold :category do |config|
-    config.actions.exclude :delete
+#    config.actions.exclude :delete
     config.label = "Categories"
     config.columns = [:name, :description, :parent]
     config.list.columns = [:name, :description,]
