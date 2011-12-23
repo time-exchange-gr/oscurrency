@@ -18,7 +18,7 @@ class Category < ActiveRecord::Base
   end
 
   validates_presence_of :name
-  has_and_belongs_to_many :reqs, :order => 'created_at DESC'
+  has_and_belongs_to_many :reqs, :conditions => "biddable IS true", :order => 'created_at DESC'
   has_and_belongs_to_many :offers, :order => 'created_at DESC'
   has_and_belongs_to_many :people, :conditions => Person.conditions_for_active
   acts_as_tree
@@ -45,7 +45,7 @@ class Category < ActiveRecord::Base
 
   def current_and_active_reqs
     today = DateTime.now
-    reqs = self.reqs.find(:all, :conditions => ["active = ? AND due_date >= ?", true, today], :order => 'created_at DESC')
+    reqs = self.reqs.find(:all, :conditions => ["biddable = ? AND due_date >= ?", true, today], :order => 'created_at DESC')
     reqs.delete_if { |req| req.has_approved? }
   end
 

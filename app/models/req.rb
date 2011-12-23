@@ -24,7 +24,7 @@ class Req < ActiveRecord::Base
     description
   end
   
-  named_scope :active, :conditions => {:active => true}
+  named_scope :active, :conditions => ["active IS true AND due_date >= ?", DateTime.now]
   named_scope :with_group_id, lambda {|group_id| {:conditions => ['group_id = ?', group_id]}}
   named_scope :search, lambda { |text| {:conditions => ["lower(name) LIKE ? OR lower(description) LIKE ?","%#{text}%".downcase,"%#{text}%".downcase]} }
 
@@ -38,10 +38,12 @@ class Req < ActiveRecord::Base
   attr_accessor :ability
   attr_protected :ability
   attr_protected :person_id, :created_at, :updated_at
+  attr_readonly :estimated_hours
   attr_readonly :group_id
   validates_presence_of :name, :due_date
   validates_presence_of :group_id
 
+  before_create :make_active, :if => :biddable
   after_create :notify_workers, :if => :notifications
   after_create :log_activity
 
@@ -49,21 +51,33 @@ class Req < ActiveRecord::Base
 
     def current_and_active(page=1)
       today = DateTime.now
-      @reqs = Req.paginate(:all, :page => page, :conditions => ["active = ? AND due_date >= ?", true, today], :order => 'created_at DESC')
+      @reqs = Req.paginate(:all, :page => page, :conditions => ["biddable = ? AND due_date >= ?", true, today], :order => 'created_at DESC')
       @reqs.delete_if { |req| req.has_approved? }
     end
 
     def all_active(page=1)
-      @reqs = Req.paginate(:all, :page => page, :conditions => ["active = ?", true], :order => 'created_at DESC')
+      @reqs = Req.paginate(:all, :page => page, :conditions => ["biddable = ?", true], :order => 'created_at DESC')
     end
 
-    def search(category,group,page,posts_per_page,search=nil)
+    def search(category,group,active_only,page,posts_per_page,search=nil)
       unless category
-        group.reqs.active.search(search).paginate(:page => page, :per_page => posts_per_page)
+        chain = group.reqs
+        chain = chain.search(search) if search
       else
-        category.reqs.active.with_group_id(group.id).paginate(:page => page, :per_page => posts_per_page)
+        chain = category.reqs.with_group_id(group.id)
       end
+
+      chain = chain.active if active_only
+      chain.paginate(:page => page, :per_page => posts_per_page)
     end
+  end
+
+  def considered_active?
+    active? && (due_date > DateTime.now)
+  end
+
+  def deactivate
+    update_attribute(:active,false)
   end
 
   def unit
@@ -119,6 +133,10 @@ class Req < ActiveRecord::Base
         errors.add(:group_id, "does not include you as a member")
       end
     end
+  end
+
+  def make_active
+    self.active = true
   end
 
   def notify_workers

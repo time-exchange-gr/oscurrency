@@ -10,7 +10,7 @@
   </p>
     <%= display req.formatted_categories, :class => "meta" %>
   <p>
-    <%= display simple_format_without_paragraph req.description %>
+    <%= markdown(req.description) %>
   </p>
   <p class="meta">
     <%= render :partial => "shared/bid_message", :collection => approved_messages(req) %>
@@ -22,8 +22,13 @@
     <% if can?(:update, req) -%>
       | <%= link_to t('button_edit'), edit_req_path(req), :class => 'show-follow' %>
     <% end -%>
-    <% if req.active? && can?(:destroy, req) -%>
-      | <%= link_to t('button_delete'), req, :class => 'delete_req' %>
+    <% if req.biddable? %>
+      <% if can?(:destroy, req) -%>
+        | <%= link_to t('button_delete'), req, :class => 'delete_req' %>
+      <% end -%>
+      <% if can?(:deactivate, req) && req.considered_active? -%>
+        | <%= link_to t('button_deactivate'), deactivate_req_path(req), :class => 'deactivate_req' %>
+      <% end -%>
     <% end -%>
     <br>
 <!--    
