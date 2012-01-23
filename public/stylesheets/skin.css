@@ -7,10 +7,26 @@ body {
   float: left;
   width: 100%;
 }
+
+#wrap {
+  float: left;
+}
+
 #wrap, #header, #footer {
   margin: 0 auto;
   text-align: left;
   width: 844px;
+}
+
+.center {
+  margin: 0 auto;
+}
+
+#left-banner {
+  float: left;
+  width: 260px;
+  height: 280px;
+  margin: 4px 0px 0px 0px;
 }
 
 /*
