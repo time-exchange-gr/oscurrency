@@ -22,6 +22,10 @@ body {
   margin: 0 auto;
 }
 
+.banner {
+  padding: 25px 15px;
+}
+
 #left-banner {
   float: left;
   width: 260px;
