@@ -24,7 +24,9 @@ begin
       ActionMailer::Base.smtp_settings = {
         :address    => global_prefs.smtp_server,
         :port       => 25,
-        :domain     => global_prefs.domain
+        :domain     => global_prefs.domain,
+        :user_name => ENV['SMTP_USER'],
+        :password => ENV['SMTP_PASSWORD']
       }
     end
   end
