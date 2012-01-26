@@ -1,12 +1,12 @@
 class BroadcastMailer < ActionMailer::Base
-  extend PreferencesHelper 
-  
+  extend PreferencesHelper
+
   def spew(person, subject, message, sent_at = Time.now)
     subject    formatted_subject(subject)
     recipients person.email
-    from       "Time Exchange Notes <notes@#{domain}>"
+    from       "Time Exchange Notes <oscurrency@#{domain}>"
     sent_on    sent_at
-    
+
     body       "message" => message,
                "person" => person,
                "preferences_note" => preferences_note(person)
@@ -31,7 +31,7 @@ private
 
     def preferences_note(person)
       %(To change your email notification preferences, visit
-      
+
 http://#{server}/people/#{person.to_param}/edit)
     end
 end
