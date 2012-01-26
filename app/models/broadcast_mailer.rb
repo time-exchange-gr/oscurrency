@@ -4,7 +4,7 @@ class BroadcastMailer < ActionMailer::Base
   def spew(person, subject, message, sent_at = Time.now)
     subject    formatted_subject(subject)
     recipients person.email
-    from       "Time Exchange Notes <oscurrency@#{domain}>"
+    from       "Athens Time Exchange <newsletter@#{domain}>"
     sent_on    sent_at
 
     body       "message" => message,
