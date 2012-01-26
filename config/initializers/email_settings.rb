@@ -23,10 +23,10 @@ begin
       ActionMailer::Base.delivery_method = :smtp
       ActionMailer::Base.smtp_settings = {
         :address    => global_prefs.smtp_server,
-        :port       => 465,
+        :port       => 25,
         :domain     => global_prefs.domain,
-        :tls => true,
-        :openssl_verify_mode => 'none',
+        #:tls => true,
+        #:openssl_verify_mode => 'none',
         :authentication => :plain,
         :user_name => ENV['SMTP_USER'],
         :password => ENV['SMTP_PASSWORD']
