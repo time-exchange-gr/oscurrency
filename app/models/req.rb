@@ -118,6 +118,26 @@ class Req < ActiveRecord::Base
     end
   end
 
+  def perform
+    workers = []
+    # even though pseudo-reqs created by direct payments do not have associated categories, let's
+    # be extra cautious and check for the active property as well
+    #
+    if self.active? && Req.global_prefs.can_send_email? && Req.global_prefs.email_notifications?
+      self.categories.each do |category|
+        workers << category.people
+      end
+
+      workers.flatten!
+      workers.uniq!
+      workers.each do |worker|
+        if worker.active?
+          PersonMailer.deliver_req_notification(self, worker) if worker.connection_notifications?
+        end
+      end
+    end
+  end
+
   private
 
   def validate
@@ -141,25 +161,5 @@ class Req < ActiveRecord::Base
 
   def send_req_notifications
     Cheepnis.enqueue(self)
-  end
-
-  def perform
-    workers = []
-    # even though pseudo-reqs created by direct payments do not have associated categories, let's
-    # be extra cautious and check for the active property as well
-    #
-    if self.active? && Req.global_prefs.can_send_email? && Req.global_prefs.email_notifications?
-      self.categories.each do |category|
-        workers << category.people
-      end
-
-      workers.flatten!
-      workers.uniq!
-      workers.each do |worker|
-        if worker.active?
-          PersonMailer.deliver_req_notification(self, worker) if worker.connection_notifications?
-        end
-      end
-    end
   end
 end
