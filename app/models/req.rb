@@ -4,26 +4,26 @@
 # Table name: reqs
 #
 #  id              :integer(4)      not null, primary key
-#  name            :string(255)     
-#  description     :text            
+#  name            :string(255)
+#  description     :text
 #  estimated_hours :decimal(8, 2)   default(0.0)
-#  due_date        :datetime        
-#  person_id       :integer(4)      
-#  created_at      :datetime        
-#  updated_at      :datetime        
+#  due_date        :datetime
+#  person_id       :integer(4)
+#  created_at      :datetime
+#  updated_at      :datetime
 #  active          :boolean(1)      default(TRUE)
-#  twitter         :boolean(1)      
+#  twitter         :boolean(1)
 #
 
 class Req < ActiveRecord::Base
   include ActivityLogger
-  extend PreferencesHelper 
+  extend PreferencesHelper
 
   index do
     name
     description
   end
-  
+
   named_scope :active, :conditions => ["active IS true AND due_date >= ?", DateTime.now]
   named_scope :with_group_id, lambda {|group_id| {:conditions => ['group_id = ?', group_id]}}
   named_scope :search, lambda { |text| {:conditions => ["lower(name) LIKE ? OR lower(description) LIKE ?","%#{text}%".downcase,"%#{text}%".downcase]} }
@@ -44,7 +44,7 @@ class Req < ActiveRecord::Base
   validates_presence_of :group_id
 
   before_create :make_active, :if => :biddable
-  after_create :notify_workers, :if => :notifications
+  after_create :send_req_notifications, :if => :notifications
   after_create :log_activity
 
   class << self
@@ -139,7 +139,11 @@ class Req < ActiveRecord::Base
     self.active = true
   end
 
-  def notify_workers
+  def send_req_notifications
+    Cheepnis.enqueue(self)
+  end
+
+  def perform
     workers = []
     # even though pseudo-reqs created by direct payments do not have associated categories, let's
     # be extra cautious and check for the active property as well
