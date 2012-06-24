@@ -155,9 +155,7 @@ class PersonMailer < ActionMailer::Base
   end
   
   def preferences_note(person)
-    %(To change your email notification preferences, visit
-      
-http://#{server}/people/#{person.to_param}/edit)
+    I18n.t("person_mailer.message_notification.prefs_note", :address => "http://#{server}/people/#{person.to_param}/edit")
   end
 
   def forum_preferences_note(person,group)
