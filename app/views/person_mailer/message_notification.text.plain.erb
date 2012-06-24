@@ -1,7 +1,5 @@
-<%= strip_tags(@message.content) %>
---
-<%= t('person_mailer.message_notification.click_to_view') %> <%= @server %>:
+<%= t('person_mailer.message_notification.intro', :domain => @domain, :sender => @message.sender.name) %>
 
-http://<%= @server %>/messages/<%= @message.to_param %>
+<%= t('person_mailer.message_notification.read_plain', :address => "http://#{@server}/messages/#{@message.to_param}") %>
 
 <%= @preferences_note %>
