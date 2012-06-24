@@ -575,7 +575,7 @@ fr:
       for_group: "for group"
     message_notification:
       new: "New message"
-      intro: "%{sender} has sent you a message on %{domain}."
+      intro: "%{sender} has sent you a message."
       read_link: "Click %{href} to read it."
       read_link_href: "here"
       read_plain: "Go to %{address} to read it."

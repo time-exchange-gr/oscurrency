@@ -1,4 +1,4 @@
-<%= t('person_mailer.message_notification.intro', :domain => @domain, :sender => @message.sender.name) %>
+<%= t('person_mailer.message_notification.intro', :sender => @message.sender.name) %>
 
 <%= t('person_mailer.message_notification.read_plain', :address => "http://#{@server}/messages/#{@message.to_param}") %>
 

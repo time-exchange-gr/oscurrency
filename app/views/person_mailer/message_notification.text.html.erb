@@ -1,6 +1,6 @@
 <div>
   <p>
-    <%= t('person_mailer.message_notification.intro', :domain => @domain, :sender => @message.sender.name) %>
+    <%= t('person_mailer.message_notification.intro', :sender => @message.sender.name) %>
   <p>
   <p>
     <%= t('person_mailer.message_notification.read_link', :href => link_to(t('person_mailer.message_notification.read_link_href'), "http://#{@server}/messages/#{@message.to_param}")) %>
