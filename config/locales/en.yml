@@ -518,6 +518,7 @@ en:
       new: "You have a new membership request from"
       for_group: "for group"
     message_notification:
+      new: "New message"
       intro: "%{sender} has sent you a message on %{domain}."
       read_link: "Click %{href} to read it."
       read_link_href: "here"

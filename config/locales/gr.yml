@@ -633,6 +633,7 @@ gr:
       new: "Έχετε μια νέα αίτηση συμμετοχής από"
       for_group: "για την ομάδα"
     message_notification:
+      new: "Καινούριο μήνυμα"
       intro: "Έχετε λάβει καινούριο μήνυμα από %{sender} στο %{domain}."
       read_link: "Πατήστε %{href} για να το διαβάσετε."
       read_link_href: "εδώ"
