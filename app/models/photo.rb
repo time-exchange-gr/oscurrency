@@ -37,25 +37,26 @@ class Photo < ActiveRecord::Base
                                   :icon         => '36>',
                                   :bounded_icon => '36x36>' }
   
-  has_many :activities, :foreign_key => "item_id", :conditions => "item_type = 'Photo'", :dependent => :destroy
+  has_many :activities, :as => :item, :dependent => :destroy
+  validate :filename_to_upload_exists_and_images_are_correct_format
     
   after_save :log_activity
                  
   # Override the crappy default AttachmentFu error messages.
-  def validate
+  def filename_to_upload_exists_and_images_are_correct_format
     if filename.nil?
-      errors.add_to_base("You must choose a file to upload")
+      errors.add(:base, "You must choose a file to upload")
     else
       # Images should only be GIF, JPEG, or PNG
       enum = attachment_options[:content_type]
       unless enum.nil? || enum.include?(send(:content_type))
-        errors.add_to_base("You can only upload images (GIF, JPEG, or PNG)")
+        errors.add(:base, "You can only upload images (GIF, JPEG, or PNG)")
       end
       # Images should be less than UPLOAD_LIMIT MB.
       enum = attachment_options[:size]
       unless enum.nil? || enum.include?(send(:size))
         msg = "Images should be smaller than #{UPLOAD_LIMIT} MB"
-        errors.add_to_base(msg)
+        errors.add(:base, msg)
       end
     end
   end

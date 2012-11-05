@@ -1,4 +1,7 @@
 class ReqsController < ApplicationController
+
+  respond_to :html, :xml, :json, :js
+
   skip_before_filter :require_activation, :only => [:show, :index]
   before_filter :login_required, :except => [:show, :index]
   before_filter :login_or_oauth_required, :only => [:show, :index]
@@ -10,32 +13,16 @@ class ReqsController < ApplicationController
   # GET /reqs
   # GET /reqs.xml
   def index
-=begin
-    if params[:filter]
-      if "all" == params[:filter]
-        @reqs = Req.all_active(params[:page])
-      else
-        @reqs = Req.current_and_active(params[:page])
-      end
-    else
-      @reqs = Req.current_and_active(params[:page])
-    end
-=end
     @selected_category = params[:category_id].nil? ? nil : Category.find(params[:category_id])
 
-    @reqs = Req.search(@selected_neighborhood || @selected_category, 
-                       @group, 
-                       active=params[:scope].nil?, # if a scope is not passed, just return actives
-                       params[:page], 
-                       AJAX_POSTS_PER_PAGE,
-                       params[:search]
-                       )
-
-    respond_to do |format|
-      format.js
-      # format.html # index.html.erb
-      format.xml  { render :xml => @reqs }
-    end
+    @reqs = Req.custom_search(@selected_neighborhood || @selected_category,
+                              @group,
+                              active=params[:scope].nil?, # if a scope is not passed, just return actives
+                              params[:page],
+                              AJAX_POSTS_PER_PAGE,
+                              params[:search]
+                              ).order("updated_at desc")
+    respond_with @reqs
   end
 
   # GET /reqs/1
@@ -53,23 +40,18 @@ class ReqsController < ApplicationController
       end
     end
 
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @req }
-      format.js
-    end
+    respond_with @req
   end
 
   # GET /reqs/new
-  # GET /reqs/new.xml
   def new
-    @all_categories = Category.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-    @all_neighborhoods = Neighborhood.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
+    @all_categories = Category.by_long_name
+    @all_neighborhoods = Neighborhood.by_long_name
     @selected_neighborhoods = current_person.neighborhoods
 
     respond_to do |format|
       format.js
-      format.xml  { render :xml => @req }
+      format.html { redirect_to group_path(@group, :anchor => 'reqs/new') }
     end
   end
 
@@ -77,8 +59,8 @@ class ReqsController < ApplicationController
   def edit
     @req = Req.find(params[:id])
     @group = @req.group
-    @all_categories = Category.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-    @all_neighborhoods = Neighborhood.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
+    @all_categories = Category.by_long_name
+    @all_neighborhoods = Neighborhood.by_long_name
 
     respond_to do |format|
       format.js
@@ -90,25 +72,21 @@ class ReqsController < ApplicationController
   def create
     #@req = Req.new(params[:req])
     @req.group = @group
-
-    if @req.due_date.blank?
-      @req.due_date = 7.days.from_now
-    else
-      @req.due_date += 1.day - 1.second # make due date at end of day
-    end
     @req.person = current_person
+
+    @all_categories = Category.by_long_name
+    @all_neighborhoods = Neighborhood.by_long_name
 
     respond_to do |format|
       if @req.save
+        @reqs = Req.custom_search(nil,@group,active=true,page=1,AJAX_POSTS_PER_PAGE,nil).order("updated_at desc")
         flash[:notice] = t('success_request_created')
-        @all_categories = Category.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-        @all_neighborhoods = Neighborhood.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-        @reqs = Req.search(nil,@group,active=true,page=1,AJAX_POSTS_PER_PAGE,nil)
+        #respond_with @req
+        #format.html { redirect_to(@req) }
         format.js
-        format.xml  { render :xml => @req, :status => :created, :location => @req }
+        format.xml  { head :ok }
       else
-        @all_categories = Category.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-        @all_neighborhoods = Neighborhood.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
+        format.html { render :action => "new" }
         format.js { render :action => "new" }
         format.xml  { render :xml => @req.errors, :status => :unprocessable_entity }
       end
@@ -120,19 +98,17 @@ class ReqsController < ApplicationController
   def update
     @req = Req.find(params[:id])
     @group = @req.group
+    @all_categories = Category.by_long_name
+    @all_neighborhoods = Neighborhood.by_long_name
 
     respond_to do |format|
       if @req.update_attributes(params[:req])
         flash[:notice] = t('notice_request_updated')
-        @all_categories = Category.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-        @all_neighborhoods = Neighborhood.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-        @reqs = Req.search(nil,@group,active=true,page=1,AJAX_POSTS_PER_PAGE,nil)
+        @reqs = Req.custom_search(nil,@group,active=true,page=1,AJAX_POSTS_PER_PAGE,nil).order("updated_at desc")
         format.html { redirect_to(@req) }
         format.js
         format.xml  { head :ok }
       else
-        @all_categories = Category.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
-        @all_neighborhoods = Neighborhood.find(:all, :order => "parent_id, name").sort_by { |a| a.long_name }
         format.html { render :action => "edit" }
         format.js { render :action => "edit" }
         format.xml  { render :xml => @req.errors, :status => :unprocessable_entity }
@@ -156,7 +132,7 @@ class ReqsController < ApplicationController
       format.xml  { head :ok }
       format.js
     end
-  end 
+  end
 
   def deactivate
     @req = Req.find(params[:id])
@@ -169,7 +145,7 @@ class ReqsController < ApplicationController
     end
   end
 
-  private
+  # private
 
   def correct_person_and_no_accept_required
     request = Req.find(params[:id])

@@ -14,4 +14,10 @@ module OffersHelper
       "toggle-all-offers"
     end
   end
+
+  def formatted_offer_categories(categories)
+    text = ""
+    categories.each {|c| text << c + "<br>"}
+    text.html_safe
+  end
 end

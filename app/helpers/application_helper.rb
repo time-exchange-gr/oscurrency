@@ -3,10 +3,9 @@ module ApplicationHelper
 
   def current_page_pre22?(options)
     url_string = CGI.escapeHTML(url_for(options))
-    request = @controller.request
-    request_uri = request.request_uri
+    request_uri = request.fullpath
     if url_string =~ /^\w+:\/\//
-      url_string == "#{request.protocol}#{request.host_with_port}#{request_uri}"
+      url_string == "#{request.protocol}#{request.host_with_port}#{request.fullpath}"
     else
       url_string == request_uri
     end
@@ -19,6 +18,17 @@ module ApplicationHelper
   end
   
   ## Menu helpers
+
+  def display_help?
+    !(
+      global_prefs.about.blank? &&
+      global_prefs.practice.blank? &&
+      global_prefs.steps.blank? &&
+      global_prefs.contact.blank? &&
+      global_prefs.agreement.blank? &&
+      global_prefs.questions.blank?
+    )
+  end
   
   def menu
     home     = menu_element("Home",   home_path)
@@ -29,7 +39,7 @@ module ApplicationHelper
     else
       forum = menu_element("Forums", forums_path)
     end
-    if logged_in? and not admin_view?
+    if logged_in?
       profile  = menu_element("Profile",  person_path(current_person))
       offers = menu_element("Offers", offers_path)
       requests = menu_element("Requests", reqs_path)
@@ -42,18 +52,8 @@ module ApplicationHelper
 #      links = [home, profile, contacts, messages, blog, people, forum]
       #events   = menu_element("Events", events_path)
         links = [home, profile, categories, offers, requests, people, messages, groups, forum]
-      # TODO: remove 'unless production?' once events are ready.
-      #links.push(events) #unless production?
-      
-    elsif logged_in? and admin_view?
-      spam = menu_element("eNews", admin_broadcast_emails_path)
-      people =  menu_element("People", admin_people_path)
-      exchanges =  menu_element("Ledger", admin_exchanges_path)
-      feed = menu_element("Feed", admin_feed_posts_path)
-      preferences = menu_element("Prefs", admin_preferences_path)
-      categories = menu_element("Categories", admin_categories_path)
-      neighborhoods = menu_element("Neighborhoods", admin_neighborhoods_path)
-      links = [spam, categories, neighborhoods, people, exchanges, feed, preferences]
+      # TODO: remove 'unless Rails.env.production?' once events are ready.
+      #links.push(events) #unless Rails.env.production?
     else
       #links = [home, people]
       links = [home, categories]
@@ -83,19 +83,20 @@ module ApplicationHelper
   end
 
   def waiting_image
-    "<span class='wait' style='display:none'><img alt='wait' class='wait' src='/images/loading.gif'></span>"
+    img = image_tag("loading.gif",:class=>"wait",:alt=>"wait")
+    "<span class='wait' style='display:none'>#{img}</span>".html_safe
   end
 
   def organization_image(person)
     if person.org?
-      "<img title=\"#{t('people.show.organization_profile')}\" src=\"/images/icons/community_small.png\" />"
+      image_tag("icons/community_small.png",:title=> t('people.show.organization_profile'))
     else
       ""
     end
   end
 
   def currency_units
-    "<span id='units' class='small'>#{t('currency_unit_plural')}</span>"
+    "<span id='units' class='small'>#{t('currency_unit_plural')}</span>".html_safe
   end
 
   def menu_element(content, address)
@@ -112,11 +113,6 @@ module ApplicationHelper
     content_tag(:li, menu_link_to(link, options), :class => klass)
   end
   
-  # Return true if the user is viewing the site in admin view.
-  def admin_view?
-    params[:controller] =~ /admin/ and admin?
-  end
-  
   def admin?
     logged_in? and current_person.admin?
   end
@@ -128,8 +124,11 @@ module ApplicationHelper
   end
 
   def markdown(text)
-    options = [:hard_wrap, :no_intraemphasis]
-    Redcarpet.new(text || "", *options).to_html.html_safe
+    markdown_parser.render(text).html_safe
+  end
+
+  def markdown_parser
+    @markdown_parser ||= Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(:hard_wrap => true))
   end
 
   # Display text by sanitizing and formatting.
@@ -149,7 +148,7 @@ module ApplicationHelper
       # Sometimes Markdown throws exceptions, so rescue gracefully.
       processed_text = content_tag(:p, sanitize(text))
     end
-    add_tag_options(processed_text, tag_opts)
+    add_tag_options(processed_text, tag_opts).html_safe
   end
   
   # Output a column div.
@@ -163,7 +162,7 @@ module ApplicationHelper
     # Allow callers to pass in additional classes.
     options[:class] = "#{klass} #{options[:class]}".strip
     content = content_tag(:div, capture(&block), options)
-    concat(content)
+    #concat(content)
   end
 
   def account_link(account, options = {})
@@ -173,24 +172,39 @@ module ApplicationHelper
       str = ""
     else
       credit_limit = account.credit_limit.nil? ? "" : "(limit: #{account.credit_limit.to_s})"
-      action = "#{account.balance} #{account.group.unit} #{credit_limit}"
+      action = "#{account.balance_with_initial_offset} #{account.group.unit} #{credit_limit}"
       str = link_to(img,path, options)
       str << " "
       str << link_to_unless_current(action, path, options)
+      # str.html_safe
     end
   end
 
   def exchange_link(person, group = nil, options = {})
     img = image_tag("icons/switch.gif")
     path = new_person_exchange_path(person, ({:group => group.id} unless group.nil?))
-    action = "Give credit"
+    action = t('exchanges.record_transaction')
     str = link_to(img,path,options)
     str << " "
     str << link_to_unless_current(action, path, options)
+    # str.html_safe
+  end
+
+  def support_link(person, group = nil, options = {})
+    img = image_tag("icons/question.gif")
+    path = person_path(person)
+    action = t('people.show.support_contact')
+    str = link_to(img,path,options)
+    str << " "
+    str << link_to_unless_current(action, path, options)
+    # str.html_safe
   end
 
   def email_link(person, options = {})
     reply = options[:replying_to]
+    classes = ['email-link']
+    classes << options[:class] if options[:class]
+
     if reply
       path = reply_message_path(reply)
     else
@@ -198,10 +212,14 @@ module ApplicationHelper
     end
     img = image_tag("icons/email.gif")
     action = reply.nil? ? "Send a message" : "Send reply"
-    opts = { :class => 'email-link' }
+    opts = { :class => classes.join(' ') }
     str = link_to(img, path, opts)
     str << " "
     str << link_to_unless_current(action, path, opts)
+  end
+
+  def first_n_words(s, n=20)
+    s.to_s[/(\s*\S+){,#{n}}/]
   end
 
   # Return a formatting note (depends on the presence of a Markdown library)
