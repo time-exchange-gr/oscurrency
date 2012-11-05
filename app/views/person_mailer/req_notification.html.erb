@@ -1,4 +1,15 @@
-[<%= h @name %>] <%= t('person_mailer.req_notification.matches_a_skill_category_you_have') %> 
+A new request has been created that you might be able to help with.
+
+The title of the request is X
+
+Click here to view the request and reply to it.
+
+This is an automatically generated email and was sent to you based on the skill
+categories that you have selected in your <a href="X">profile</a>.
+
+You can change your notification preferences for new requests by visiting X.
+
+"<%= h @name %>" <%= t('person_mailer.req_notification.matches_a_skill_category_you_have') %> 
 
 http://<%= @server %><%= @url %>
 
