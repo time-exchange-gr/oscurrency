@@ -121,6 +121,7 @@ en:
       primary: "primary"
       add_a_photo: "Add a photo"
       private_txns: "Private transactions"
+      enable_forum: "Enable forum"
     members:
       pending_request: "Pending request"
       cancel_membership: "Cancel membership"
@@ -248,6 +249,9 @@ en:
       header: "New offer"
       total_available: "Total available"
       description_label: "Be sure to include your preferred means of communication, i.e. email. text or telephone."
+    new_photo:
+      header: "Offer photo upload"
+      upload_a_photo: "Upload a photo"
     show:
       header: "Offer"
       send: "Send"
@@ -549,6 +553,11 @@ en:
   will_paginate:
     previous_label: "&laquo; Previous"
     next_label: "Next &raquo;"
+
+  valid_email:
+    validations:
+      email:
+        invalid: "is invalid."
 
   notice_warning_your_email_address: "Warning: your email address is still at"
   notice_change_it_here: "Change it here"

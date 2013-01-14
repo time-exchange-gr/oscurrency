@@ -2,19 +2,18 @@
 
 source :rubygems
 
-gem 'rails', '~> 3.1.3'
+gem 'rails', '3.2.11'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'pg'
 gem "unicorn"
-gem "newrelic_rpm"
 gem "girl_friday"
 gem "exception_notification", :git => "https://github.com/smartinez87/exception_notification.git"
 
 group :assets do
-  gem "sass-rails", '3.1.5'
+  gem "sass-rails"
   gem "uglifier"
   gem 'jquery-ui-rails'
 end
@@ -34,6 +33,8 @@ gem "feed-normalizer"
 gem "texticle"
 
 gem "aws-s3"
+gem "fog"
+gem "carrierwave"
 gem "rmagick", :require => 'RMagick'
 gem "json"
 gem "geokit-rails3"
@@ -64,6 +65,7 @@ group :development, :test do
   gem "artifice"
   gem "opentransact"
   gem 'annotate'
+  gem 'libv8', '3.11.8.3'
   gem 'therubyracer'
 end
 
@@ -75,5 +77,4 @@ group :test do
   gem "guard-spork"
   gem "rspec-rails" # :lib => false unless File.directory?(File.join(Rails.root, 'vendor/plugins/rspec-rails'))
   gem "spork"
-  gem "test-unit"
 end

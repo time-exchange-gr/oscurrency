@@ -6,6 +6,7 @@ class Ability
     can :su, Person do |target_person|
       person.admin? && !target_person.admin?
     end
+    can :unsu, Person
 
     if person.admin?
       can :dashboard
@@ -113,7 +114,7 @@ class Ability
     can :create, Offer do |offer|
       Membership.mem(person,offer.group)
     end
-    can :update, Offer do |offer|
+    can [:update,:new_photo,:save_photo], Offer do |offer|
       person.is?(:admin,offer.group) || offer.person == person || person.admin?
     end
     can :destroy, Offer do |offer|

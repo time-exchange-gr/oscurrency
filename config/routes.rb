@@ -43,7 +43,12 @@ Oscurrency::Application.routes.draw do
     resources :bids
   end
 
-  resources :offers
+  resources :offers do
+    member do
+      get :new_photo
+      post :save_photo
+    end
+  end
   resources :categories
 
   resources :memberships do
@@ -72,6 +77,7 @@ Oscurrency::Application.routes.draw do
     member do
       get :verify_email
       get :su
+      get :unsu
       get :common_contacts
     end
     resources :messages

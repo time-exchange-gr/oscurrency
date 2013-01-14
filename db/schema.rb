@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20121103012147) do
+ActiveRecord::Schema.define(:version => 20130106003629) do
 
   create_table "accounts", :force => true do |t|
     t.string   "name"
@@ -241,6 +241,7 @@ ActiveRecord::Schema.define(:version => 20121103012147) do
     t.integer  "metadata_id"
     t.string   "metadata_type"
     t.time     "deleted_at"
+    t.string   "notes"
   end
 
   create_table "feed_posts", :force => true do |t|
@@ -286,6 +287,7 @@ ActiveRecord::Schema.define(:version => 20121103012147) do
     t.decimal  "default_credit_limit", :precision => 8, :scale => 2
     t.string   "asset"
     t.boolean  "private_txns",                                       :default => false
+    t.boolean  "enable_forum",                                       :default => true
   end
 
   create_table "groups_people", :id => false, :force => true do |t|
@@ -467,6 +469,9 @@ ActiveRecord::Schema.define(:version => 20121103012147) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "group_id"
+    t.string   "picture"
+    t.integer  "photoable_id"
+    t.string   "photoable_type"
   end
 
   add_index "photos", ["parent_id"], :name => "index_photos_on_parent_id"
@@ -522,6 +527,7 @@ ActiveRecord::Schema.define(:version => 20121103012147) do
     t.boolean  "protected_categories",    :default => false
     t.string   "mailchimp_list_id"
     t.boolean  "mailchimp_send_welcome",  :default => true
+    t.string   "locale"
   end
 
   create_table "rails_admin_histories", :force => true do |t|

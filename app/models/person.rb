@@ -5,7 +5,12 @@ class Person < ActiveRecord::Base
   extend PreferencesHelper
 
   acts_as_authentic do |c|
-    c.openid_required_fields = [:nickname, :email]
+    c.openid_required_fields = ['http://axschema.org/contact/email',
+      'http://axschema.org/namePerson/first',
+      'http://axschema.org/namePerson/last',
+      :fullname,
+      :email
+    ]
     c.perishable_token_valid_for = 48.hours
     c.maintain_sessions = false if Rails.env == "test"
   end
@@ -91,7 +96,7 @@ class Person < ActiveRecord::Base
 
   has_many :connections
   has_many :contacts, :through => :connections, :conditions => {"connections.status" => Connection::ACCEPTED}
-  has_many :photos, :dependent => :destroy, :order => 'created_at'
+  has_many :photos, :as => :photoable, :dependent => :destroy, :order => 'created_at'
   has_many :requested_contacts, :through => :connections, :source => :contact#, :conditions => REQUESTED_AND_ACTIVE
 
   with_options :dependent => :destroy, :order => 'created_at DESC' do |person|
@@ -153,7 +158,7 @@ class Person < ActiveRecord::Base
   #validates_acceptance_of :accept_agreement, :accept => true, :message => "Please accept the agreement to complete registration", :on => :create
 
   before_create :check_config_for_deactivation
-  before_create :set_default_group
+  before_create :set_language_and_default_group
   after_create :create_address
   after_create :join_mandatory_groups
   before_save :update_group_letter
@@ -313,8 +318,9 @@ class Person < ActiveRecord::Base
     addresses.create(:name => 'personal', :zipcode_plus_4 => (zipcode.presence || DEFAULT_ZIPCODE_STRING))
   end
 
-  def set_default_group
+  def set_language_and_default_group
     self.default_group_id = Person.global_prefs.default_group_id
+    self.language = Person.global_prefs.locale
   end
 
   def join_mandatory_groups
@@ -355,19 +361,19 @@ class Person < ActiveRecord::Base
   end
 
   def main_photo
-    photo.nil? ? "default.png" : photo.public_filename
+    photo.nil? ? "default.png" : photo.pic
   end
 
   def thumbnail
-    photo.nil? ? "default_thumbnail.png" : photo.public_filename(:thumbnail)
+    photo.nil? ? "default_thumbnail.png" : photo.pic(:thumbnail)
   end
 
   def icon
-    photo.nil? ? "default_icon.png" : photo.public_filename(:icon)
+    photo.nil? ? "default_icon.png" : photo.pic(:icon)
   end
 
   def bounded_icon
-    photo.nil? ? "default_icon.png" : photo.public_filename(:bounded_icon)
+    photo.nil? ? "default_icon.png" : photo.pic(:icon)
   end
 
   # Return the photos ordered by primary first, then by created_at.
@@ -422,9 +428,18 @@ class Person < ActiveRecord::Base
 
   protected
 
-  def map_openid_registration(registration)
-    self.email = registration['email'] if email.blank?
-    self.name = registration['nickname'] if name.blank?
+  def map_openid_registration(sreg_registration, ax_registration)
+    unless sreg_registration.nil?
+      self.email = sreg_registration['email'] if email.blank?
+      self.name = sreg_registration['fullname'] if name.blank?
+    end
+    unless ax_registration.nil?
+      self.email = ax_registration["http://axschema.org/contact/email"].first if email.blank?
+      if name.blank?
+        self.name = [ax_registration['http://axschema.org/namePerson/first'].first,
+                     ax_registration['http://axschema.org/namePerson/last'].first].join(' ')
+      end
+    end
   end
 
   ## Callbacks
