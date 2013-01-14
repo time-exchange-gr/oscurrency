@@ -1,3 +1,11 @@
+module Net
+  class SMTP
+    def tls?
+      true
+    end
+  end
+end
+
 begin
   unless Rails.env.test?
     global_prefs = Preference.first
