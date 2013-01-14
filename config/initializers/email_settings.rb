@@ -17,7 +17,7 @@ begin
         :address        => ENV['SMTP_SERVER'] || 'smtp.sendgrid.net',
         :port           => smtp_port,
         :authentication => :plain,
-        :enable_starttls_auto => starttls_auto,
+        :enable_starttls_auto => true,
         :user_name      => ENV['SMTP_USER'] || ENV['SENDGRID_USERNAME'],
         :password       => ENV['SMTP_PASSWORD'] || ENV['SENDGRID_PASSWORD'],
         :domain         => ENV['SMTP_DOMAIN'] || 'herokuapp.com'
