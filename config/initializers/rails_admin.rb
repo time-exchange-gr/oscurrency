@@ -157,6 +157,7 @@ end
         properties[:collection] = [['English','en'],['Spanish','es'],['French','fr'],['Greek','gr']]
         partial "select"
       end
+      field :logout_url
       field :blog_feed_url
       field :new_member_notification
       field :googlemap_api_key
