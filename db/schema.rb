@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130106003629) do
+ActiveRecord::Schema.define(:version => 20130116044808) do
 
   create_table "accounts", :force => true do |t|
     t.string   "name"
@@ -20,8 +20,10 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "group_id"
-    t.decimal  "credit_limit", :precision => 8, :scale => 2
+    t.decimal  "credit_limit", :precision => 8, :scale => 2, :default => 0.0
     t.decimal  "offset",       :precision => 8, :scale => 2, :default => 0.0
+    t.decimal  "paid",         :precision => 8, :scale => 2, :default => 0.0
+    t.decimal  "earned",       :precision => 8, :scale => 2, :default => 0.0
   end
 
   create_table "activities", :force => true do |t|
@@ -41,8 +43,8 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
   create_table "activity_statuses", :force => true do |t|
     t.string   "name",        :limit => 100, :null => false
     t.string   "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   create_table "addresses", :force => true do |t|
@@ -112,16 +114,16 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
   create_table "business_types", :force => true do |t|
     t.string   "name",        :limit => 100, :null => false
     t.string   "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   create_table "capabilities", :force => true do |t|
     t.integer  "group_id"
     t.integer  "oauth_token_id"
     t.string   "scope"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",     :null => false
+    t.datetime "updated_at",     :null => false
     t.datetime "invalidated_at"
   end
 
@@ -284,10 +286,13 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
     t.string   "unit"
     t.boolean  "adhoc_currency",                                     :default => false
     t.boolean  "mandatory",                                          :default => false
-    t.decimal  "default_credit_limit", :precision => 8, :scale => 2
+    t.decimal  "default_credit_limit", :precision => 8, :scale => 2, :default => 0.0
     t.string   "asset"
     t.boolean  "private_txns",                                       :default => false
     t.boolean  "enable_forum",                                       :default => true
+    t.boolean  "display_balance",                                    :default => true
+    t.boolean  "display_earned",                                     :default => false
+    t.boolean  "display_paid",                                       :default => false
   end
 
   create_table "groups_people", :id => false, :force => true do |t|
@@ -304,7 +309,7 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
 
   create_table "member_preferences", :force => true do |t|
     t.boolean  "req_notifications",   :default => true
-    t.boolean  "forum_notifications", :default => true
+    t.boolean  "forum_notifications", :default => false
     t.integer  "membership_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -480,8 +485,8 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
   create_table "plan_types", :force => true do |t|
     t.string   "name",        :limit => 100, :null => false
     t.string   "description"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",                 :null => false
+    t.datetime "updated_at",                 :null => false
   end
 
   create_table "posts", :force => true do |t|
@@ -528,6 +533,7 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
     t.string   "mailchimp_list_id"
     t.boolean  "mailchimp_send_welcome",  :default => true
     t.string   "locale"
+    t.string   "logout_url",              :default => ""
   end
 
   create_table "rails_admin_histories", :force => true do |t|
@@ -537,8 +543,8 @@ ActiveRecord::Schema.define(:version => 20130106003629) do
     t.string   "table"
     t.integer  "month",      :limit => 2
     t.integer  "year",       :limit => 8
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.datetime "created_at",              :null => false
+    t.datetime "updated_at",              :null => false
   end
 
   add_index "rails_admin_histories", ["item", "table", "month", "year"], :name => "index_histories_on_item_and_table_and_month_and_year"
