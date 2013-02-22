@@ -21,13 +21,9 @@ class Photo < ActiveRecord::Base
   include ActivityLogger
   UPLOAD_LIMIT = 5 # megabytes
   
-  # attr_accessible is a nightmare with attachment_fu, so use
-  # attr_protected instead.
-  attr_protected :id, :person_id, :parent_id, :created_at, :updated_at
-  
-  belongs_to :person
-  belongs_to :group
   belongs_to :photoable, :polymorphic => true
+
+  attr_accessible :picture, :primary, :photoable
 
   has_many :activities, :as => :item, :dependent => :destroy
 
@@ -38,9 +34,9 @@ class Photo < ActiveRecord::Base
   
   def log_activity
     if self.primary?
-      unless self.person.nil?
-        activity = Activity.create!(:item => self, :person => self.person)
-        add_activities(:activity => activity, :person => self.person)
+      unless (self.photoable.nil? || self.photoable.class != Person)
+        activity = Activity.create!(:item => self, :person => self.photoable)
+        add_activities(:activity => activity, :person => self.photoable)
       end
     end
   end
