@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130319015937) do
+ActiveRecord::Schema.define(:version => 20130330192749) do
 
   create_table "accounts", :force => true do |t|
     t.string   "name"
@@ -20,7 +20,7 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "group_id"
-    t.decimal  "credit_limit", :precision => 8, :scale => 2, :default => 0.0
+    t.decimal  "credit_limit", :precision => 8, :scale => 2
     t.decimal  "offset",       :precision => 8, :scale => 2, :default => 0.0
     t.decimal  "paid",         :precision => 8, :scale => 2, :default => 0.0
     t.decimal  "earned",       :precision => 8, :scale => 2, :default => 0.0
@@ -43,24 +43,25 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
   create_table "activity_statuses", :force => true do |t|
     t.string   "name",        :limit => 100, :null => false
     t.string   "description"
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "addresses", :force => true do |t|
     t.integer  "person_id"
-    t.string   "name",           :limit => 50
-    t.string   "address_line_1", :limit => 50
-    t.string   "address_line_2", :limit => 50
-    t.string   "address_line_3", :limit => 50
-    t.string   "city",           :limit => 50
+    t.string   "name",            :limit => 50
+    t.string   "address_line_1",  :limit => 50
+    t.string   "address_line_2",  :limit => 50
+    t.string   "address_line_3",  :limit => 50
+    t.string   "city",            :limit => 50
     t.string   "county_id"
     t.integer  "state_id"
-    t.string   "zipcode_plus_4", :limit => 10
-    t.decimal  "latitude",                     :precision => 12, :scale => 8
-    t.decimal  "longitude",                    :precision => 12, :scale => 8
+    t.string   "zipcode_plus_4",  :limit => 10
+    t.decimal  "latitude",                      :precision => 12, :scale => 8
+    t.decimal  "longitude",                     :precision => 12, :scale => 8
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "address_privacy",                                              :default => false
   end
 
   create_table "audits", :force => true do |t|
@@ -114,16 +115,16 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
   create_table "business_types", :force => true do |t|
     t.string   "name",        :limit => 100, :null => false
     t.string   "description"
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "capabilities", :force => true do |t|
     t.integer  "group_id"
     t.integer  "oauth_token_id"
     t.string   "scope"
-    t.datetime "created_at",     :null => false
-    t.datetime "updated_at",     :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
     t.datetime "invalidated_at"
   end
 
@@ -286,13 +287,13 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
     t.string   "unit"
     t.boolean  "adhoc_currency",                                     :default => false
     t.boolean  "mandatory",                                          :default => false
-    t.decimal  "default_credit_limit", :precision => 8, :scale => 2, :default => 0.0
+    t.decimal  "default_credit_limit", :precision => 8, :scale => 2
     t.string   "asset"
     t.boolean  "private_txns",                                       :default => false
-    t.boolean  "enable_forum",                                       :default => true
     t.boolean  "display_balance",                                    :default => true
     t.boolean  "display_earned",                                     :default => false
     t.boolean  "display_paid",                                       :default => false
+    t.boolean  "enable_forum",                                       :default => true
   end
 
   create_table "groups_people", :id => false, :force => true do |t|
@@ -309,7 +310,7 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
 
   create_table "member_preferences", :force => true do |t|
     t.boolean  "req_notifications",   :default => true
-    t.boolean  "forum_notifications", :default => false
+    t.boolean  "forum_notifications", :default => true
     t.integer  "membership_id"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -481,8 +482,8 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
   create_table "plan_types", :force => true do |t|
     t.string   "name",        :limit => 100, :null => false
     t.string   "description"
-    t.datetime "created_at",                 :null => false
-    t.datetime "updated_at",                 :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "posts", :force => true do |t|
@@ -528,8 +529,9 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
     t.boolean  "protected_categories",    :default => false
     t.string   "mailchimp_list_id"
     t.boolean  "mailchimp_send_welcome",  :default => true
-    t.string   "locale"
     t.string   "logout_url",              :default => ""
+    t.string   "locale"
+    t.boolean  "public_uploads",          :default => false
   end
 
   create_table "rails_admin_histories", :force => true do |t|
@@ -539,8 +541,8 @@ ActiveRecord::Schema.define(:version => 20130319015937) do
     t.string   "table"
     t.integer  "month",      :limit => 2
     t.integer  "year",       :limit => 8
-    t.datetime "created_at",              :null => false
-    t.datetime "updated_at",              :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "rails_admin_histories", ["item", "table", "month", "year"], :name => "index_histories_on_item_and_table_and_month_and_year"
